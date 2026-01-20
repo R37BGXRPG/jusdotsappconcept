@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JusDots - Login</title>
+    <link rel="stylesheet" href="deepOcean.css">
+    <style>
+        body { font-family: 'Poppins', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: var(--bg-main); }
+        .login-card { background: var(--panel-bg); padding: 40px; border-radius: 30px; width: 350px; text-align: center; color: var(--text-color); }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: none; background: var(--item-bg); color: white; box-sizing: border-box; }
+        .btn { width: 100%; padding: 15px; border-radius: 20px; border: none; cursor: pointer; font-weight: bold; margin-top: 10px; font-family: inherit; }
+        #google-btn { background: white; color: #444; }
+        #phone-btn { background: var(--dusty-denim); color: var(--ink-black); }
+    </style>
+</head>
+<body class="theme-deep-ocean">
+
+<div class="login-card">
+    <h2 id="auth-title">JusDots Login</h2>
+    <button id="google-btn" class="btn">Continue with Google</button>
+    <div style="margin: 20px 0; opacity: 0.3;">OR</div>
+    <div id="phone-ui">
+        <input type="tel" id="phoneNumber" placeholder="+1234567890">
+        <div id="recaptcha-container"></div>
+        <button id="phone-btn" class="btn">Login with Phone</button>
+    </div>
+    <div id="otp-ui" style="display:none;">
+        <input type="text" id="otpCode" placeholder="6-digit code">
+        <button id="verify-btn" class="btn" style="background:var(--alabaster-grey)">Verify Code</button>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyApxpA5L31Tl3amG1vSPbKFUW0WJedK8XY",
+        authDomain: "jusdots-aggregator.firebaseapp.com",
+        projectId: "jusdots-aggregator",
+        storageBucket: "jusdots-aggregator.firebasestorage.app",
+        messagingSenderId: "814287216066",
+        appId: "1:814287216066:web:7975cec7e030f1b1204a5b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Google Login
+    document.getElementById('google-btn').onclick = () => {
+        const provider = new GoogleAuthProvider();
+        signInWithPopup(auth, provider).then(() => {
+            window.location.href = 'index.html';
+        }).catch(err => alert(err.message));
+    };
+
+    // Phone Login
+    let confirmationResult;
+    document.getElementById('phone-btn').onclick = () => {
+        const number = document.getElementById('phoneNumber').value;
+        const recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { 'size': 'invisible' });
+        
+        signInWithPhoneNumber(auth, number, recaptchaVerifier).then((result) => {
+            confirmationResult = result;
+            document.getElementById('phone-ui').style.display = 'none';
+            document.getElementById('otp-ui').style.display = 'block';
+        }).catch(err => alert(err.message));
+    };
+
+    document.getElementById('verify-btn').onclick = () => {
+        const code = document.getElementById('otpCode').value;
+        confirmationResult.confirm(code).then(() => {
+            window.location.href = 'index.html';
+        }).catch(() => alert("Invalid Code"));
+    };
+</script>
+</body>
+</html>
