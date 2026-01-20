@@ -1,0 +1,20 @@
+/* Warm Autumn Glow Theme Values */
+:root {
+    --deep-space-blue: #003049ff;
+    --flag-red: #d62828ff;
+    --vivid-tangerine: #f77f00ff;
+    --sunflower-gold: #fcbf49ff;
+    --vanilla-custard: #eae2b7ff;
+
+    /* Logic Mapping */
+    --bg-main: var(--deep-space-blue);     /* Dark background */
+    --panel-bg: var(--flag-red);          /* Main panels */
+    --item-bg: var(--vivid-tangerine);    /* Sidebar items */
+    --accent: var(--sunflower-gold);      /* Sent message bubbles */
+    --text-color: var(--vanilla-custard); /* Text */
+}
+
+body.theme-warm-autumn {
+    background-color: var(--bg-main);
+    color: var(--text-color);
+}

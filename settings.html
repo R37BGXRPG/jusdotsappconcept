@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Settings - Appearance</title>
+    <link id="themeLink" rel="stylesheet" href="deepOcean.css">
+    <style>
+        @font-face {
+            font-family: 'Poppins';
+            src: url(https://design.penpot.app/internal/gfonts/font/poppins/v24/pxiEyp8kv8JHgFVrJJfecg.woff2) format('woff2');
+        }
+
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            /* These variables now come from the linked CSS files */
+            background-color: var(--bg-main);
+            color: var(--text-color);
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            transition: background-color 0.3s ease;
+        }
+
+        .settings-container { display: flex; height: 100vh; padding: 20px; gap: 20px; }
+
+        .sidebar {
+            width: 359px; background: var(--panel-bg);
+            border-radius: 30px; padding: 20px; display: flex; flex-direction: column; gap: 15px;
+        }
+
+        .nav-item {
+            background: var(--item-bg); height: 69px; border-radius: 30px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; cursor: pointer; transition: transform 0.2s;
+        }
+        .nav-item:hover { transform: scale(1.02); }
+
+        .main-content { flex-grow: 1; background: var(--panel-bg); border-radius: 30px; padding: 40px; }
+        
+        .setting-group { margin-bottom: 30px; }
+        label { display: block; margin-bottom: 10px; opacity: 0.8; font-size: 18px; }
+        
+        select {
+            width: 100%; max-width: 400px; padding: 15px; border-radius: 15px;
+            background: var(--item-bg); color: var(--text-color); border: 2px solid transparent; font-size: 16px;
+        }
+        select:focus { border-color: var(--text-color); }
+
+        .save-btn {
+            background: var(--text-color); color: var(--bg-main); border: none;
+            padding: 15px 40px; border-radius: 30px; font-weight: bold; cursor: pointer;
+            margin-top: 20px; font-size: 18px;
+        }
+    </style>
+</head>
+<body class="theme-deep-ocean">
+
+<div class="settings-container">
+    <div class="sidebar">
+        <div class="nav-item" onclick="window.location.href='index.html'" style="background:transparent; border:1px solid var(--item-bg); font-size: 18px;">← Back to Chat</div>
+        <div class="nav-item">Settings</div>
+        <div class="nav-item" style="border: 2px solid var(--text-color);">Appearance</div>
+        <div class="nav-item">About Us</div>
+    </div>
+
+    <div class="main-content">
+        <h2>Appearance</h2>
+
+        <div class="setting-group">
+            <label>Theme</label>
+            <select id="themeSelect">
+                <option value="theme-deep-ocean">Deep Ocean</option>
+                <option value="theme-warm-autumn">Warm Autumn Glow</option>
+            </select>
+        </div>
+
+        <div class="setting-group">
+            <label>Font Category</label>
+            <select id="fontStyleSelect">
+                <option value="">Select Style</option>
+                <option value="sans-serif">Sans-Serif</option>
+                <option value="monospace">Monospace</option>
+            </select>
+        </div>
+
+        <div class="setting-group">
+            <label>Font Family</label>
+            <select id="specificFontSelect" disabled>
+                <option value="">Choose category first</option>
+            </select>
+        </div>
+
+        <button class="save-btn" id="saveBtn">Save & Apply</button>
+    </div>
+</div>
+
+<script>
+    const themeFiles = {
+        'theme-deep-ocean': 'deepOcean.css',
+        'theme-warm-autumn': 'warmAutumnGlow.css'
+    };
+
+    const themeSelect = document.getElementById('themeSelect');
+    const styleSelect = document.getElementById('fontStyleSelect');
+    const specificSelect = document.getElementById('specificFontSelect');
+    const themeLink = document.getElementById('themeLink');
+
+    // 1. Function to swap CSS file and Body Class
+    function applyTheme(themeName) {
+        if (themeFiles[themeName]) {
+            themeLink.href = themeFiles[themeName];
+            document.body.className = themeName;
+        }
+    }
+
+    // 2. Preview theme immediately when dropdown changes
+    themeSelect.onchange = (e) => {
+        applyTheme(e.target.value);
+    };
+
+    // 3. Font logic
+    const fontData = {
+        'sans-serif': ['Poppins', 'Arial', 'Helvetica'],
+        'monospace': ['Courier New', 'Consolas', 'Monaco']
+    };
+
+    styleSelect.onchange = function() {
+        specificSelect.innerHTML = '<option value="">Choose Font</option>';
+        if (this.value) {
+            specificSelect.disabled = false;
+            fontData[this.value].forEach(f => {
+                let opt = document.createElement('option');
+                opt.value = f; opt.innerText = f;
+                specificSelect.appendChild(opt);
+            });
+        } else { specificSelect.disabled = true; }
+    };
+
+    // 4. Save to LocalStorage
+    document.getElementById('saveBtn').onclick = () => {
+        localStorage.setItem('userTheme', themeSelect.value);
+        localStorage.setItem('userFontStyle', styleSelect.value);
+        localStorage.setItem('userFontFamily', specificSelect.value);
+        alert('Settings Saved!');
+        window.location.href = 'index.html';
+    };
+
+    // 5. Load existing settings on Page Load
+    window.onload = () => {
+        const savedTheme = localStorage.getItem('userTheme');
+        const savedStyle = localStorage.getItem('userFontStyle');
+        const savedFont = localStorage.getItem('userFontFamily');
+
+        if (savedTheme) {
+            themeSelect.value = savedTheme;
+            applyTheme(savedTheme);
+        }
+
+        if (savedStyle) {
+            styleSelect.value = savedStyle;
+            styleSelect.onchange(); // Trigger font list population
+            if (savedFont) specificSelect.value = savedFont;
+        }
+    };
+</script>
+</body>
+</html>

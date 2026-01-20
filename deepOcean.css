@@ -1,0 +1,20 @@
+/* Deep Ocean Theme Values */
+:root {
+    --ink-black: #0d1b2aff;
+    --prussian-blue: #1b263bff;
+    --dusk-blue: #415a77ff;
+    --dusty-denim: #778da9ff;
+    --alabaster-grey: #e0e1ddff;
+
+    /* Mapping them to functional variables */
+    --bg-main: var(--ink-black);
+    --panel-bg: var(--prussian-blue);
+    --item-bg: var(--dusk-blue);
+    --accent: var(--dusty-denim);
+    --text-color: var(--alabaster-grey);
+}
+
+body.theme-deep-ocean {
+    background-color: var(--bg-main);
+    color: var(--text-color);
+}
