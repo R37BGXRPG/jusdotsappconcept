@@ -1,246 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <title>Chat Aggregator</title>
-    <link id="themeLink" rel="stylesheet" href="deepOcean.css">
-    <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JusDots - Unified Chat</title>
+    
+    <link rel="stylesheet" href="deepOcean.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyApxpA5L31Tl3amG1vSPbKFUW0WJedK8XY",
-        authDomain: "jusdots-aggregator.firebaseapp.com",
-        projectId: "jusdots-aggregator",
-        storageBucket: "jusdots-aggregator.firebasestorage.app",
-        messagingSenderId: "814287216066",
-        appId: "1:814287216066:web:7975cec7e030f1b1204a5b"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    onAuthStateChanged(auth, (user) => {
-        if (!user) {
-            // No user is logged in, redirect to login page
-            window.location.href = 'auth.html';
-        } else {
-            console.log("Logged in as:", user.uid);
-            // Optional: Update UI with user info here
-        }
-    });
-</script>
-
-    <script>
-        // Check local storage before the page finishes rendering to prevent "flicker"
-        const savedTheme = localStorage.getItem('userTheme');
-        if (savedTheme) {
-            const themeFiles = {
-                'theme-deep-ocean': 'deepOcean.css',
-                'theme-warm-autumn': 'warmAutumnGlow.css'
-            };
-            document.getElementById('themeLink').href = themeFiles[savedTheme];
-            document.documentElement.className = savedTheme;
-        }
-    </script>
     <style>
-        @font-face {
-            font-family: 'Poppins';
-            src: url(https://design.penpot.app/internal/gfonts/font/poppins/v24/pxiEyp8kv8JHgFVrJJfecg.woff2) format('woff2');
-        }
-
-        body,
-        html {
+        /* Hide the body initially to prevent the "Flash" of content for unauthenticated users */
+        body { 
+            display: none; 
             margin: 0;
-            padding: 0;
-            height: 100%;
             font-family: 'Poppins', sans-serif;
-            overflow: hidden;
         }
-
-        .app-container {
+        
+        .user-profile-mini {
             display: flex;
-            height: 100vh;
-            padding: 20px;
-            gap: 15px;
-            box-sizing: border-box;
-        }
-
-        .column {
-            background: var(--panel-bg);
-            border-radius: 30px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        #apps-col {
-            width: 350px;
-        }
-
-        #people-col {
-            width: 350px;
-        }
-
-        #chat-col {
-            flex-grow: 1;
-        }
-
-        .column-header {
-            padding: 25px;
-            font-size: 24px;
-            font-weight: bold;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .list-container {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
+            align-items: center;
             gap: 10px;
-        }
-
-        .item-card {
-            background: var(--item-bg);
-            border-radius: 20px;
-            padding: 20px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        /* Message Bubbles */
-        .message {
-            max-width: 70%;
-            padding: 12px 18px;
-            border-radius: 20px;
-            font-size: 15px;
-            line-height: 1.4;
-        }
-
-        .received {
-            background: var(--item-bg);
-            align-self: flex-start;
-            border-bottom-left-radius: 5px;
-        }
-
-        .sent {
-            background: var(--accent);
-            color: var(--ink-black);
-            align-self: flex-end;
-            border-bottom-right-radius: 5px;
-        }
-
-        .input-area {
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.1);
-            display: flex;
-            gap: 10px;
-        }
-
-        #msgInput {
-            flex-grow: 1;
-            background: var(--item-bg);
-            border: none;
             padding: 15px;
-            border-radius: 25px;
-            color: white;
-            outline: none;
-        }
-
-        .nav-footer {
-            padding: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .settings-btn {
             background: var(--item-bg);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .user-profile-mini img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+        }
+
+        .logout-btn {
+            background: transparent;
+            color: #ff5f5f;
+            border: 1px solid #ff5f5f;
+            padding: 5px 10px;
+            border-radius: 8px;
             cursor: pointer;
-            width: 100%;
-            font-family: inherit;
+            font-size: 12px;
+            margin-top: 10px;
         }
     </style>
 </head>
-
 <body class="theme-deep-ocean">
 
     <div class="app-container">
-        <div class="column" id="apps-col">
-            <div class="column-header">APPS</div>
-            <div class="list-container">
-                <div class="item-card" onclick="selectApp('WhatsApp')">WhatsApp</div>
-                <div class="item-card" onclick="selectApp('Discord')">Discord</div>
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>JusDots</h2>
             </div>
-            <div class="nav-footer">
-                <button class="settings-btn" onclick="window.location.href='settings.html'">⚙️ Settings</button>
+            
+            <div class="user-profile-mini">
+                <img id="user-pic" src="https://via.placeholder.com/35" alt="Profile">
+                <div>
+                    <div id="user-name" style="font-size: 14px; font-weight: bold;">Loading...</div>
+                    <button class="logout-btn" onclick="logout()">Sign Out</button>
+                </div>
             </div>
-        </div>
 
-        <div class="column" id="people-col">
-            <div class="column-header" id="people-header">Select App</div>
-            <div class="list-container" id="people-list"></div>
-        </div>
+            <nav class="nav-menu">
+                <a href="#" class="active">All Chats</a>
+                <a href="settings.html">Settings</a>
+            </nav>
+        </aside>
 
-        <div class="column" id="chat-col">
-            <div class="column-header" id="chat-name">Conversation</div>
-            <div class="list-container" id="chat-box">
-                <div class="message received">Select a chat to start...</div>
+        <main class="chat-list">
+            <div class="search-bar">
+                <input type="text" placeholder="Search messages...">
+            </div>
+            <div class="conversations">
+                <div class="chat-item active">
+                    <div class="avatar">W</div>
+                    <div class="details">
+                        <h4>WhatsApp Group</h4>
+                        <p>Hey, did you see the update?</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <section class="message-view">
+            <header class="chat-header">
+                <h3>WhatsApp Group</h3>
+            </header>
+            <div class="chat-window">
+                <div class="message received">How is the app coming along?</div>
+                <div class="message sent">Just added the Auth Gateway!</div>
             </div>
             <div class="input-area">
-                <input type="text" id="msgInput" placeholder="Type a message...">
+                <input type="text" placeholder="Type a message...">
+                <button class="send-btn">Send</button>
             </div>
-        </div>
+        </section>
     </div>
 
     <script>
-        function applySavedPreferences() {
-            const theme = localStorage.getItem('userTheme') || 'theme-deep-ocean';
-            const font = localStorage.getItem('userFontFamily');
-            const style = localStorage.getItem('userFontStyle');
-            document.body.className = theme;
-            if (font) document.body.style.fontFamily = `${font}, ${style}`;
-        }
-        applySavedPreferences();
-
-        const mockData = {
-            'WhatsApp': [{ name: 'Mom', last: 'See you soon!' }],
-            'Discord': [{ name: 'Gaming Group', last: 'GG WP' }]
+        // 1. YOUR FIREBASE CONFIGURATION
+        const firebaseConfig = {
+            apiKey: "AIzaSyApxpA5L31Tl3amG1vSPbKFUW0WJedK8XY",
+            authDomain: "jusdots-aggregator.firebaseapp.com",
+            projectId: "jusdots-aggregator",
+            storageBucket: "jusdots-aggregator.firebasestorage.app",
+            messagingSenderId: "814287216066",
+            appId: "1:814287216066:web:7975cec7e030f1b1204a5b"
         };
 
-        function selectApp(app) {
-            document.getElementById('people-header').innerText = app;
-            const list = document.getElementById('people-list');
-            list.innerHTML = '';
-            (mockData[app] || []).forEach(person => {
-                const div = document.createElement('div');
-                div.className = 'item-card';
-                div.innerText = person.name;
-                div.onclick = () => { document.getElementById('chat-name').innerText = person.name; };
-                list.appendChild(div);
-            });
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
         }
 
-        // Input Handling
-        document.getElementById('msgInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter' && this.value.trim() !== "") {
-                const bubble = document.createElement('div');
-                bubble.className = 'message sent';
-                bubble.innerText = this.value;
-                const chatBox = document.getElementById('chat-box');
-                chatBox.appendChild(bubble);
-                this.value = '';
-                chatBox.scrollTop = chatBox.scrollHeight;
+        // 2. THE GATEKEEPER
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                // User is logged in
+                console.log("Access Granted:", user.uid);
+                
+                // Show the body
+                document.body.style.display = "block";
+                
+                // Update Profile UI
+                document.getElementById('user-name').innerText = user.displayName || user.phoneNumber || "User";
+                if (user.photoURL) {
+                    document.getElementById('user-pic').src = user.photoURL;
+                }
+            } else {
+                // No user found, redirect to your auth.html
+                window.location.href = 'auth.html';
             }
         });
+
+        // 3. LOGOUT FUNCTION
+        function logout() {
+            firebase.auth().signOut().then(() => {
+                window.location.href = 'auth.html';
+            });
+        }
     </script>
 </body>
-
-
 </html>
-
