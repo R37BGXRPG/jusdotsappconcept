@@ -5,6 +5,32 @@
     <meta charset="UTF-8">
     <title>Chat Aggregator</title>
     <link id="themeLink" rel="stylesheet" href="deepOcean.css">
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyApxpA5L31Tl3amG1vSPbKFUW0WJedK8XY",
+        authDomain: "jusdots-aggregator.firebaseapp.com",
+        projectId: "jusdots-aggregator",
+        storageBucket: "jusdots-aggregator.firebasestorage.app",
+        messagingSenderId: "814287216066",
+        appId: "1:814287216066:web:7975cec7e030f1b1204a5b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            // No user is logged in, redirect to login page
+            window.location.href = 'auth.html';
+        } else {
+            console.log("Logged in as:", user.uid);
+            // Optional: Update UI with user info here
+        }
+    });
+</script>
 
     <script>
         // Check local storage before the page finishes rendering to prevent "flicker"
@@ -214,5 +240,6 @@
         });
     </script>
 </body>
+
 
 </html>
